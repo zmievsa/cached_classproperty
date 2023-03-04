@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 __version__ = importlib.metadata.version("cached_classproperty")
 
-from functools import cached_property, partial
+from functools import cached_property
 
 _NOT_FOUND = object()
 
