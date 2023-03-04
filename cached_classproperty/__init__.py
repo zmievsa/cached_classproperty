@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     T = TypeVar("T")
     P = ParamSpec("P")
 
-    def cached_classproperty(func: Callable[Concatenate[Any, P], T]) -> T:
+    def cached_classproperty(func: Callable[Concatenate[Any, P], T], attrname: str | None = None) -> T:
         ...
 
 else:
