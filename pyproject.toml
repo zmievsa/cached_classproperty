@@ -1,14 +1,16 @@
 [tool.poetry]
-name = "any-python-template"
+name = "cached_classproperty"
 version = "0.1.0"
 description = ""
 authors = ["Stanislav Zmiev <szmiev2000@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.8"
 
-[tool.poetry.dev-dependencies]
+
+[tool.poetry.group.dev.dependencies]
+typing-extensions = "^4.5.0"
 pyupgrade = "*"
 black = "*"
 autoflake = "*"
@@ -16,6 +18,30 @@ pytest = ">=7.2.1"
 pytest-cov = ">=4.0.0"
 isort = "*"
 
+
+[tool.coverage.report]
+skip_covered = true
+skip_empty = true
+# Taken from https://coverage.readthedocs.io/en/7.1.0/excluding.html#advanced-exclusion
+exclude_lines = [
+    "pragma: no cover",
+    "assert_never\\(",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if False:",
+    "if 0:",
+    "class .*\\bProtocol\\):",
+    "if __name__ == .__main__.:",
+    # Impossible to cover
+    # It is impossible to cover "if TYPE_CHECKING" statements because they never actually run
+    "if TYPE_CHECKING:",
+    "@(abc\\.)?abstractmethod",
+    "@(typing\\.)?overload",
+    "__rich_repr__",
+    "__repr__",
+]
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

@@ -21,4 +21,4 @@ format:
 	poetry run black .;
 
 test:
-	poetry run pytest -v --cov=any_python_template --cov-report=term-missing:skip-covered --cov-branch --cov-report=xml tests;
+	poetry run pytest -v --cov=cached_classproperty --cov-report=term-missing:skip-covered --cov-branch --cov-report=xml tests;
