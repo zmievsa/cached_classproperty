@@ -1,4 +1,5 @@
 import importlib.metadata
+from _thread import RLock  # type: ignore
 from typing import TYPE_CHECKING
 
 __version__ = importlib.metadata.version("cached_classproperty")
@@ -21,6 +22,23 @@ if TYPE_CHECKING:
 else:
 
     class cached_classproperty(cached_property):
+        __slots__ = ("func", "attrname", "__doc__", "lock")
+
+        def __init__(self, func, attrname: str | None = None):
+            self.func = func
+            self.attrname = attrname
+            self.__doc__ = func.__doc__
+            self.lock = RLock()
+
+        def __set_name__(self, owner, name):
+            if self.attrname is None:
+                self.attrname = name
+            elif name != self.attrname:
+                raise TypeError(
+                    "Cannot assign the same cached_property to two different names "
+                    f"({self.attrname!r} and {name!r})."
+                )
+
         def __get__(self, instance, owner=None):
             if owner is None:
                 raise TypeError("Cannot use cached_classproperty without an owner class.")
