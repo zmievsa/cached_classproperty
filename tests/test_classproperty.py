@@ -148,3 +148,61 @@ def test__cached_classproperty__when_inherited__behaves_like_classmethod():
     assert Subclass1.my_cached_classproperty == Subclass1.my_classmethod()
     assert Subclass2.my_cached_classproperty == Subclass2.my_classmethod()
     assert Finalclass.my_cached_classproperty == Finalclass.my_classmethod()
+
+
+def test__cached_classproperty__super():
+    class Superclass:
+        @cached_classproperty
+        def my_cached_classproperty(cls):
+            return ("Superclass",)
+        @classmethod
+        def my_classmethod(cls):
+            return ("Superclass",)
+
+
+    class Subclass1(Superclass):
+        @cached_classproperty
+        def my_cached_classproperty(cls):
+            return (
+                *super().my_cached_classproperty,
+                "Subclass1",
+            )
+        @classmethod
+        def my_classmethod(cls):
+            return (
+                *super().my_classmethod(),
+                "Subclass1",
+            )
+
+    class Subclass2(Superclass):
+        @cached_classproperty
+        def my_cached_classproperty(cls):
+            return (
+                *super().my_cached_classproperty,
+                "Subclass2",
+            )
+        @classmethod
+        def my_classmethod(cls):
+            return (
+                *super().my_classmethod(),
+                "Subclass2",
+            )
+
+    class Finalclass(Subclass1, Subclass2):
+        @cached_classproperty
+        def my_cached_classproperty(cls):
+            return (
+                *super().my_cached_classproperty,
+                "Finalclass",
+            )
+        @classmethod
+        def my_classmethod(cls):
+            return (
+                *super().my_classmethod(),
+                "Finalclass",
+            )
+
+    assert Superclass.my_cached_classproperty == Superclass.my_classmethod()
+    assert Subclass1.my_cached_classproperty == Subclass1.my_classmethod()
+    assert Finalclass.my_cached_classproperty == Finalclass.my_classmethod()
+    assert Subclass2.my_cached_classproperty == Subclass2.my_classmethod()
