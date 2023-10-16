@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 __version__ = importlib.metadata.version("cached_classproperty")
 
-from functools import cached_property
+from weakref import WeakKeyDictionary
 
 _NOT_FOUND = object()
 
@@ -70,7 +70,7 @@ else:
             return val
 
     class cached_classproperty:
-        __slots__ = ("func", "attrname", "lock", "owner", "_cached_value")
+        __slots__ = ("func", "attrname", "lock", "owner", "_cached_value", "_weak_dict")
 
         def __init__(self, func, attrname: str | None = None):
             self.func = func
@@ -78,6 +78,7 @@ else:
             self.lock = RLock()
             self.owner = None
             self._cached_value = _NOT_FOUND
+            self._weak_dict = WeakKeyDictionary()
 
         def __set_name__(self, owner, name):
             # Note that this is called at the creation of the class that has cached_staticproperty in its body
@@ -89,6 +90,8 @@ else:
                     "Cannot assign the same cached_classproperty to two different names "
                     f"({self.attrname!r} and {name!r})."
                 )
+
+            # Store the owner class to enable fast path
             self.owner = owner
 
         def __get__(self, instance, owner=None):
@@ -96,29 +99,24 @@ else:
                 raise TypeError(
                     "Cannot use cached_classproperty without an owner class."
                 )
-            if self.attrname is None:
-                raise TypeError(
-                    "Cannot use cached_classproperty instance without calling __set_name__ on it."
-                )
-            if owner is not self.owner:
-                new_cached_classproperty = cached_classproperty(
-                    self.func, self.attrname
-                )
-                setattr(owner, self.attrname, new_cached_classproperty)
-                new_cached_classproperty.owner = owner
-                new_cached_classproperty.attrname = self.attrname
-                return getattr(owner, self.attrname)
-            if self._cached_value is not _NOT_FOUND:
-                return self._cached_value
-            # Classes always have __dict__ and metaclasses cannot define __slots__
-            # https://utcc.utoronto.ca/~cks/space/blog/python/HowSlotsWorkI
-            cache = owner.__dict__
-            val = cache.get(self.attrname, _NOT_FOUND)
-            if val is _NOT_FOUND or val is self:
-                with self.lock:  # type: ignore
-                    # check if another thread filled cache while we awaited lock
-                    val = cache.get(self.attrname, _NOT_FOUND)
-                    if val is _NOT_FOUND or val is self:
-                        val = self.func(owner)
-                        self._cached_value = val
+            if self.owner is owner:
+                # Fast path: use self._cached_value to take advantage of __slots__
+                val = self._cached_value
+                if val is _NOT_FOUND:
+                    with self.lock:
+                        # check if another thread filled cache while we awaited lock
+                        val = self._cached_value
+                        if val is _NOT_FOUND:
+                            val = self.func(owner)
+                            self._cached_value = val
+            else:
+                # Slow path: use self._weak_dict to avoid memory leaks
+                val = self._weak_dict.get(owner, _NOT_FOUND)
+                if val is _NOT_FOUND:
+                    with self.lock:
+                        # check if another thread filled cache while we awaited lock
+                        val = self._weak_dict.get(owner, _NOT_FOUND)
+                        if val is _NOT_FOUND:
+                            val = self.func(owner)
+                            self._weak_dict[owner] = val
             return val
