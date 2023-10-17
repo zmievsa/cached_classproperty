@@ -24,3 +24,22 @@ cached_property for class properties instead of instance properties
 ```bash
 pip install cached_classproperty
 ```
+
+## Usage
+
+Similarly to `functools.cached_property`, these properties get executed exactly once on access.
+
+```python
+from cached_classproperty import cached_staticproperty, cached_classproperty
+
+class Foo:
+    @cached_staticproperty
+    def my_staticproperty():
+        ...
+
+    @cached_classproperty
+    def my_classproperty(cls):
+        ...
+```
+
+`cached_classproperty` can be inherited and can re-execute for every inherited class just like `cached_property`. `cached_staticproperty`, on the other hand, executes exactly once even if inherited. It is also lighter and faster than `cached_classproperty`.
