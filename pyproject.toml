@@ -2,7 +2,7 @@
 name = "cached_classproperty"
 version = "1.0.0"
 description = ""
-authors = ["Stanislav Zmiev <szmiev2000@gmail.com>"]
+authors = ["Stanislav Zmiev <zmievsa@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
