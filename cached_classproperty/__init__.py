@@ -14,15 +14,14 @@ if TYPE_CHECKING:
     from typing_extensions import Concatenate
 
     T = TypeVar("T")
-    P = ParamSpec("P")
 
     def cached_staticproperty(
-        func: Callable[Concatenate[P], T], attrname: str | None = None
+        func: Callable[[], T], attrname: str | None = None
     ) -> T:
         ...
 
     def cached_classproperty(
-        func: Callable[Concatenate[Any, P], T], attrname: str | None = None
+        func: Callable[[type], T], attrname: str | None = None
     ) -> T:
         ...
 
