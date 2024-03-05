@@ -1,6 +1,6 @@
 import importlib.metadata
 from _thread import RLock  # type: ignore
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 __version__ = importlib.metadata.version("cached_classproperty")
 
@@ -17,12 +17,12 @@ if TYPE_CHECKING:
     P = ParamSpec("P")
 
     def cached_staticproperty(
-        func: Callable[Concatenate[P], T], attrname: str | None = None
+        func: Callable[Concatenate[P], T], attrname: Optional[str] = None
     ) -> T:
         ...
 
     def cached_classproperty(
-        func: Callable[Concatenate[Any, P], T], attrname: str | None = None
+        func: Callable[Concatenate[Any, P], T], attrname: Optional[str] = None
     ) -> T:
         ...
 
@@ -31,7 +31,7 @@ else:
     class cached_staticproperty:
         __slots__ = ("func", "attrname", "lock")
 
-        def __init__(self, func, attrname: str | None = None):
+        def __init__(self, func, attrname: Optional[str] = None):
             self.func = func
             self.attrname = attrname
             self.lock = RLock()
@@ -72,7 +72,7 @@ else:
     class cached_classproperty:
         __slots__ = ("func", "attrname", "lock", "owner", "_cached_value", "_weak_dict")
 
-        def __init__(self, func, attrname: str | None = None):
+        def __init__(self, func, attrname: Optional[str] = None):
             self.func = func
             self.attrname = attrname
             self.lock = RLock()

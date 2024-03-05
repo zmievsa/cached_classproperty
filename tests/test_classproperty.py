@@ -155,10 +155,10 @@ def test__cached_classproperty__super():
         @cached_classproperty
         def my_cached_classproperty(cls):
             return ("Superclass",)
+
         @classmethod
         def my_classmethod(cls):
             return ("Superclass",)
-
 
     class Subclass1(Superclass):
         @cached_classproperty
@@ -167,6 +167,7 @@ def test__cached_classproperty__super():
                 *super().my_cached_classproperty,
                 "Subclass1",
             )
+
         @classmethod
         def my_classmethod(cls):
             return (
@@ -181,6 +182,7 @@ def test__cached_classproperty__super():
                 *super().my_cached_classproperty,
                 "Subclass2",
             )
+
         @classmethod
         def my_classmethod(cls):
             return (
@@ -195,6 +197,7 @@ def test__cached_classproperty__super():
                 *super().my_cached_classproperty,
                 "Finalclass",
             )
+
         @classmethod
         def my_classmethod(cls):
             return (
