@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cached_classproperty"
-version = "1.0.0"
+version = "1.0.1"
 description = ""
 authors = ["Stanislav Zmiev <zmievsa@gmail.com>"]
 license = "MIT"
