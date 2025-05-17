@@ -9,20 +9,17 @@ from weakref import WeakKeyDictionary
 _NOT_FOUND = object()
 
 if TYPE_CHECKING:
-    from typing import Any, Callable, ParamSpec, TypeVar
-
-    from typing_extensions import Concatenate
+    from typing import Any, Callable, TypeVar
 
     T = TypeVar("T")
-    P = ParamSpec("P")
 
     def cached_staticproperty(
-        func: Callable[Concatenate[P], T], attrname: Optional[str] = None
+        func: Callable[[], T], attrname: Optional[str] = None
     ) -> T:
         ...
 
     def cached_classproperty(
-        func: Callable[Concatenate[Any, P], T], attrname: Optional[str] = None
+        func: Callable[[Any], T], attrname: Optional[str] = None
     ) -> T:
         ...
 
